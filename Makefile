@@ -4,12 +4,12 @@ LD = $(TARGET)-gcc
 OBJCOPY = $(TARGET)-objcopy
 
 CFLAGS = -Wall -Werror -O0 -nostdlib -ffreestanding \
-	 -mabi=ilp32 -march=rv32ima -mcmodel=medany \
+	 -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany \
 	 -Iinclude 
 
 LDFLAGS = -T script/kernel.ld
 SRC_S = src/boot/start.S
-SRC_C = src/kernel/main.c src/kernel/uart.c
+SRC_C = src/kernel/main.c src/kernel/uart.c src/kernel/interrupt.c src/kernel/timer.c
 OBJS = $(SRC_S:.S=.o) $(SRC_C:.c=.o)
 
 all: kernel.img
