@@ -1,4 +1,5 @@
 #include "csr.h"
+#include "kernel_lib.h"
 
 void uart_putstring(const char *s);
 extern volatile long counter_tick;
@@ -13,7 +14,8 @@ void tick(){
     counter_tick++;
     
     if(counter_tick % 100 == 0){
-        uart_putstring("Tick!\n");
+       // uart_putstring("Tick!\n");
+         kernel_putstring("Tick!\n");
     }
 
     long next_time = *CLINT_MTIME + TIMER_INTERVAL;
@@ -32,5 +34,6 @@ void init_timer(void){
     mstatus_val |= MSTATUS_MIE;
     write_csr(mstatus, mstatus_val);
 
-    uart_putstring("Timer initializat\n");
+   // uart_putstring("Timer initializat\n");
+   kernel_putstring("Timer initializat\n");
 }

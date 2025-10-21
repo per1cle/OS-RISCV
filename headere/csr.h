@@ -20,8 +20,8 @@
 #define CSR_MIE      0x304 // Machine Interrupt Enable
 #define CSR_MIP      0x344 // Machine Interrupt Pending
 
-#define MSTATUS_MIE (1 << 3) // Bit-ul Machine Interrupt Enable
+#define MSTATUS_MIE (1 << 3) // Bit Machine Interrupt Enable
 
-#define MIE_MTIE (1 << 7) // Bit-ul Machine Timer Interrupt Enable
+#define MIE_MTIE (1 << 7) // Bit Machine Timer Interrupt Enable
 
 #define MCAUSE_TIMER_M (0x80000007) // Machine Timer Interrupt
