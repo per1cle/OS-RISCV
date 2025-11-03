@@ -13,3 +13,13 @@ void kernel_putstring(const char *s){
         kernel_putchar(*s++);
     }
 }
+
+void kernel_print_hex(unsigned int n) {   //++functia pt afisare de adrese 
+    char* hex_chars = "0123456789abcdef";
+    kernel_putstring("0x");
+
+    for (int i = 28; i >= 0; i -= 4) {
+        int digit = (n >> i) & 0xF;
+        kernel_putchar(hex_chars[digit]); 
+    }
+}

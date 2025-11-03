@@ -27,4 +27,9 @@ SECTIONS {
     . = ALIGN(4);
     . = . + 0x4000;
     stack_top = .;
+    
+    _heap_start = .;
+    _heap_end = 0x88000000; /*sfarsit RAM */
+
+
 }

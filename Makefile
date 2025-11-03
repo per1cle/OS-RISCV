@@ -9,7 +9,7 @@ CFLAGS = -Wall -Werror -O0 -nostdlib -ffreestanding \
 
 LDFLAGS = -T script/kernel.ld
 SRC_S = src/boot/start.S src/kernel/comutare.S
-SRC_C = src/kernel/main.c src/kernel/uart.c src/kernel/interrupt.c src/kernel/timer.c src/kernel_lib/kernel_lib.c \
+SRC_C = src/kernel/main.c src/kernel/mm.c src/kernel/uart.c src/kernel/interrupt.c src/kernel/timer.c src/kernel_lib/kernel_lib.c \
 	  src/kernel/proc.c
 	  
 OBJS = $(SRC_S:.S=.o) $(SRC_C:.c=.o)

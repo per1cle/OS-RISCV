@@ -1,0 +1,11 @@
+//Memory management
+//lista simpla de blocuri libere
+
+#include <stddef.h> 
+
+//antet in fata fiecarui bloc
+typedef struct block_header {
+    size_t size;            //dimensiune bloc + header
+    int is_free;            //1 = liber, 0 = ocupat
+    struct block_header* next; //header ul urm bloc
+} block_header_t;
