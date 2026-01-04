@@ -63,9 +63,15 @@ handler:
     sw x30, 116(sp)
     sw x31, 120(sp)
 
-    # Registrele a0-a7 sunt deja în pozițiile corecte pentru handler_c
-    # Nu trebuie să le mutăm - calling convention RISC-V
-    # a0-a7 sunt x10-x17, deja salvate mai sus
+    # Încarcă registrele a0-a7 pentru handler_c
+    lw a0, 36(sp)       # a0 = x10
+    lw a1, 40(sp)       # a1 = x11
+    lw a2, 44(sp)       # a2 = x12
+    lw a3, 48(sp)       # a3 = x13
+    lw a4, 52(sp)       # a4 = x14
+    lw a5, 56(sp)       # a5 = x15
+    lw a6, 60(sp)       # a6 = x16
+    lw a7, 64(sp)       # a7 = x17
     
     call handler_c
 

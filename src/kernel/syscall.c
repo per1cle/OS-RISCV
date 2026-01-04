@@ -8,6 +8,7 @@ extern volatile long counter_tick;
 extern void yield(void);
 extern void kernel_putchar(char c);
 extern void kernel_putstring(const char *s);
+extern void kernel_print_hex(unsigned int n);
 
 // Forward declarations pentru funcțiile syscall
 static long do_sys_write(int fd, const char *buf, long len);
@@ -32,8 +33,8 @@ void syscall_handler(long a0, long a1, long a2, long a7, long *ret){
             break;
             
         default:  
-            kernel_putstring("[SYSCALL] Unknown syscall:  ");
-            kernel_putchar('0' + (syscall_num % 10));
+            kernel_putstring("[SYSCALL] Unknown syscall: ");
+            kernel_print_hex((unsigned int)syscall_num);
             kernel_putstring("\n");
             *ret = SYSCALL_ERROR;
             break;

@@ -1,3 +1,4 @@
+OUTPUT_ARCH(riscv)
 ENTRY(boot)
 
 SECTIONS {
@@ -30,6 +31,4 @@ SECTIONS {
     
     _heap_start = .;
     _heap_end = 0x88000000; /*sfarsit RAM */
-
-
 }

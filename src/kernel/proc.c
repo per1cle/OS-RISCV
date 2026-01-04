@@ -3,10 +3,27 @@
 #include "kernel_lib.h"
 #define PROC_MAX 10
 
+
+
 void comutare(struct context *old, struct context *new);
 
 struct proc proc_table[PROC_MAX];
 int proc_actual = 0;
+
+int create_process(void *entry_point, void *stack_top) {
+    // Find free slot
+    for(int i = 1; i < PROC_MAX; i++) {
+        if(proc_table[i].state == UNUSED) {
+            proc_table[i].state = READY;
+            proc_table[i].pid = i;
+            proc_table[i].cpu_time = 0;
+            proc_table[i].context. sp = (long)stack_top;
+            proc_table[i].context.ra = (long)entry_point;
+            return i;
+        }
+    }
+    return -1;  // No free slots
+}
 
 void scheduler(void){
     proc_actual = 0;

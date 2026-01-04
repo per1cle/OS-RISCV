@@ -12,6 +12,9 @@ void scheduler(void);
 extern char _heap_start[];
 extern char _heap_end[];
 
+extern void init_ramfs(void);
+extern int exec_program(const char *name);
+
 void kmain() {
    // uart_putstring("Booting...\n");
    // uart_putstring("Hi Barbie!\n");
@@ -68,6 +71,9 @@ void kmain() {
     init_timer();
 
     init_proc();
+
+    exec_program("user1");
+    exec_program("user2");
 
     scheduler();
 

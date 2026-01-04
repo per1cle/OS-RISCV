@@ -7,6 +7,7 @@ void syscall_handler(long a0, long a1, long a2, long a7, long *ret);
 volatile long counter_tick = 0;
 
 void handler_c(long a0, long a1, long a2, long a3, long a4, long a5, long a6, long a7){
+    
     long mcause = read_csr(mcause);
     
     // Timer interrupt

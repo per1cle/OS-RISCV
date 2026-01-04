@@ -17,3 +17,5 @@ struct proc {
     char stack[4096];
     long cpu_time;     // ADAUGĂ: tick counter pentru acest proces
 };
+
+int create_process(void *entry_point, void *stack_top);

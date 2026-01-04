@@ -16,6 +16,6 @@ static inline long syscall(long num, long arg0, long arg1, long arg2) {
 }
 
 // Syscall helper macros - DUPĂ definirea funcției syscall
-#define sys_write(fd, buf, len) syscall(1, (long)(fd), (long)(buf), (long)(len))
-#define sys_yield() syscall(2, 0, 0, 0)
-#define sys_gettime() syscall(3, 0, 0, 0)
+#define sys_write(fd, buf, len) syscall(64, (long)(fd), (long)(buf), (long)(len))
+#define sys_yield() syscall(124, 0, 0, 0)
+#define sys_gettime() syscall(169, 0, 0, 0)
