@@ -6,11 +6,14 @@ struct context {
 
 enum states {
     READY,
+    RUNNING,  // Adaugă pentru tracking
     UNUSED
 };
 
 struct proc {
+    int pid;           // ADAUGĂ:  Process ID
     enum states state;
     struct context context;
     char stack[4096];
+    long cpu_time;     // ADAUGĂ: tick counter pentru acest proces
 };

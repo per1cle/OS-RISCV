@@ -15,11 +15,9 @@ void scheduler(void){
     static int last_proc = 0;
 
     while(1){
-        //write_csr(mstatus, r_csr(mstatus) | MSTATUS_MIE);
-
         int next_proc = -1;
         int start = (last_proc + 1) % PROC_MAX;
-        for(int i=0;i<PROC_MAX;i++){
+        for(int i=0; i<PROC_MAX; i++){
             int index = (start + i) % PROC_MAX;
 
             if(index == 0){
@@ -42,7 +40,6 @@ void scheduler(void){
         comutare(&proc_table[0].context, &proc_table[proc_actual].context);
 
         proc_actual = 0;
-
     }
 }
 
@@ -52,31 +49,56 @@ void yield(void){
 }
 
 void task1(void){
-    kernel_putstring("Task 1: Hey Hey!\n");
+    kernel_putstring("Task 1: Testing syscalls!\n");
+    
+    // Test sys_write
+    const char *msg = "Hello from syscall!\n";
+    sys_write(1, msg, 20);
+    
     while(1){
-        kernel_putstring("1");
+        // Test sys_gettime
+        long time = sys_gettime();
+        
+        kernel_putstring("1[t=");
+        kernel_putchar('0' + ((time / 100) % 10));
+        kernel_putchar('0' + ((time / 10) % 10));
+        kernel_putchar('0' + (time % 10));
+        kernel_putstring("] ");
+        
         for(volatile int i = 0; i < 1000000; i++);
-        yield();
+        
+        // Test sys_yield
+        sys_yield();
     }
 }
 
 void task2(void){
-    kernel_putstring("Task 2: Hello!\n");
+    kernel_putstring("Task 2: Testing syscalls!\n");
+    
     while(1){
-        kernel_putstring("2");
+        long time = sys_gettime();
+        
+        kernel_putstring("2[t=");
+        kernel_putchar('0' + ((time / 100) % 10));
+        kernel_putchar('0' + ((time / 10) % 10));
+        kernel_putchar('0' + (time % 10));
+        kernel_putstring("] ");
+        
         for(volatile int i = 0; i < 1000000; i++);
-        yield();
+        sys_yield();
     }
 }
 
 void init_proc(void){
-
     for (int i = 0; i < PROC_MAX; i++) {
-        proc_table[i].state = UNUSED;
+        proc_table[i]. state = UNUSED;
+        proc_table[i].pid = i;
+        proc_table[i].cpu_time = 0;
     }
+    
     //proc 1
     proc_table[1].state = READY;
-    proc_table[1].context.sp = (long)&proc_table[1].stack[4095];
+    proc_table[1]. context.sp = (long)&proc_table[1].stack[4095];
     proc_table[1].context.ra = (long)task1;
 
     //proc 2

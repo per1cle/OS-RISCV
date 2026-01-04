@@ -2,7 +2,7 @@
 .globl boot
 .globl handler_c
 .globl handler
-.align(2)
+.align 2
 
 boot: 
     la gp, gp
@@ -29,8 +29,8 @@ boot:
 nope: 
     j nope
 
-handler:
-    addi sp, sp, -124
+handler: 
+    addi sp, sp, -128    # Mărește la 128 (32 regs * 4 bytes)
     
     sw x1, 0(sp)
     sw x3, 8(sp)
@@ -40,14 +40,14 @@ handler:
     sw x7, 24(sp)
     sw x8, 28(sp)
     sw x9, 32(sp)
-    sw x10, 36(sp)
-    sw x11, 40(sp)
-    sw x12, 44(sp)
-    sw x13, 48(sp)
-    sw x14, 52(sp)
-    sw x15, 56(sp)
-    sw x16, 60(sp)
-    sw x17, 64(sp)
+    sw x10, 36(sp)      # a0
+    sw x11, 40(sp)      # a1
+    sw x12, 44(sp)      # a2
+    sw x13, 48(sp)      # a3
+    sw x14, 52(sp)      # a4
+    sw x15, 56(sp)      # a5
+    sw x16, 60(sp)      # a6
+    sw x17, 64(sp)      # a7
     sw x18, 68(sp)
     sw x19, 72(sp)
     sw x20, 76(sp)
@@ -63,8 +63,13 @@ handler:
     sw x30, 116(sp)
     sw x31, 120(sp)
 
+    # Registrele a0-a7 sunt deja în pozițiile corecte pentru handler_c
+    # Nu trebuie să le mutăm - calling convention RISC-V
+    # a0-a7 sunt x10-x17, deja salvate mai sus
+    
     call handler_c
 
+    # Restaurează registrele (inclusiv a0 care poate conține return value)
     lw x1, 0(sp)
     lw x3, 8(sp)
     lw x4, 12(sp)
@@ -96,6 +101,6 @@ handler:
     lw x30, 116(sp)
     lw x31, 120(sp)
 
-    addi sp, sp, 124
+    addi sp, sp, 128
 
     mret
