@@ -1,4 +1,5 @@
 #define SYS_WRITE   64
+#define SYS_EXIT    93
 #define SYS_YIELD   124
 #define SYS_GETTIME 169
 
@@ -30,6 +31,12 @@ static inline long sys_gettime(void) {
     return syscall(SYS_GETTIME, 0, 0, 0);
 }
 
+static inline void sys_exit(int status) {
+    syscall(SYS_EXIT, status, 0, 0);
+    // Never returns
+    while(1);
+}
+
 long strlen(const char *s) {
     long len = 0;
     while(s[len]) len++;
@@ -44,7 +51,7 @@ void _start(void) {
     puts("USER2: Hello from user program 2!\n");
     
     int count = 0;
-    while(count < 8) {
+    while(count < 18) {
         puts("USER2: Working... ");
         
         long time = sys_gettime();
@@ -59,12 +66,13 @@ void _start(void) {
         buf[7] = '\n';
         sys_write(1, buf, 8);
         
-        for(volatile int i = 0; i < 800000; i++);
+        // Delay mic - preemption se va întâmpla des datorită timer-ului
+        for(volatile int i = 0; i < 15000; i++);
         
-        sys_yield();
+        sys_yield();  // Yield explicit pentru cooperare
         count++;
     }
     
     puts("USER2: Exiting...\n");
-    while(1);
+    sys_exit(0);  // Exit cleanly
 }

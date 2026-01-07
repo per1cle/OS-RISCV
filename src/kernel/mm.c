@@ -121,3 +121,22 @@ void kfree(void* ptr)
     #endif
 }
 
+// Funcție pentru statistici memorie
+void mm_stats(size_t *total, size_t *used, size_t *free_mem, int *blocks) {
+    *total = 0;
+    *used = 0;
+    *free_mem = 0;
+    *blocks = 0;
+    
+    block_header_t* current = head;
+    while (current != NULL) {
+        (*blocks)++;
+        *total += current->size;
+        if (current->is_free) {
+            *free_mem += current->size;
+        } else {
+            *used += current->size;
+        }
+        current = current->next;
+    }
+}

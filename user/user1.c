@@ -1,5 +1,6 @@
 // Definițiile TREBUIE să fie IDENTICE cu cele din kernel! 
 #define SYS_WRITE   64
+#define SYS_EXIT    93
 #define SYS_YIELD   124
 #define SYS_GETTIME 169
 
@@ -33,6 +34,12 @@ static inline long sys_gettime(void) {
     return syscall(SYS_GETTIME, 0, 0, 0);
 }
 
+static inline void sys_exit(int status) {
+    syscall(SYS_EXIT, status, 0, 0);
+    // Never returns
+    while(1);
+}
+
 // Simple string length
 long strlen(const char *s) {
     long len = 0;
@@ -49,7 +56,7 @@ void _start(void) {
     puts("USER1: Hello from user program 1!\n");
     
     int count = 0;
-    while(count < 10) {
+    while(count < 20) {
         puts("USER1: Running...  ");
         
         long time = sys_gettime();
@@ -64,13 +71,13 @@ void _start(void) {
         buf[7] = '\n';
         sys_write(1, buf, 8);
         
-        // Delay
-        for(volatile int i = 0; i < 500000; i++);
+        // Delay mic - preemption se va întâmpla des datorită timer-ului
+        for(volatile int i = 0; i < 10000; i++);
         
-        sys_yield();
+        sys_yield();  // Yield explicit pentru cooperare
         count++;
     }
     
     puts("USER1: Exiting...\n");
-    while(1);  // Halt
+    sys_exit(0);  // Exit cleanly
 }

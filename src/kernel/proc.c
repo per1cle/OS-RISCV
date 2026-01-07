@@ -1,11 +1,10 @@
 #include "proc.h"
 #include "csr.h"
 #include "kernel_lib.h"
-#define PROC_MAX 10
-
-
+#include "shell.h"
 
 void comutare(struct context *old, struct context *new);
+extern volatile int need_resched;  // Flag de preemption din timer
 
 struct proc proc_table[PROC_MAX];
 int proc_actual = 0;
@@ -32,6 +31,15 @@ void scheduler(void){
     static int last_proc = 0;
 
     while(1){
+        // Check pentru input din shell (când în idle)
+        shell_poll();
+        
+        // PREEMPTION: Dacă timer a setat flag-ul, forțează switch
+        if(need_resched) {
+            need_resched = 0;
+            // Continuă cu selecția următorului proces
+        }
+        
         int next_proc = -1;
         int start = (last_proc + 1) % PROC_MAX;
         for(int i=0; i<PROC_MAX; i++){
@@ -63,6 +71,15 @@ void scheduler(void){
 void yield(void){
     proc_table[proc_actual].state = READY;
     comutare(&proc_table[proc_actual].context, &proc_table[0].context);
+}
+
+// Preemption function called from timer interrupt
+void preempt(void){
+    // Only preempt if we're running a user process (not idle)
+    if(proc_actual > 0) {
+        proc_table[proc_actual].state = READY;
+        comutare(&proc_table[proc_actual].context, &proc_table[0].context);
+    }
 }
 
 void task1(void){
@@ -113,13 +130,13 @@ void init_proc(void){
         proc_table[i].cpu_time = 0;
     }
     
-    //proc 1
-    proc_table[1].state = READY;
-    proc_table[1]. context.sp = (long)&proc_table[1].stack[4095];
-    proc_table[1].context.ra = (long)task1;
-
-    //proc 2
-    proc_table[2].state = READY;
-    proc_table[2].context.sp = (long)&proc_table[2].stack[4095];
+//    //proc 1
+//    proc_table[1].state = READY;
+//    proc_table[1]. context.sp = (long)&proc_table[1].stack[4095];
+//    proc_table[1].context.ra = (long)task1;
+//
+//    //proc 2
+//    proc_table[2].state = READY;
+//    proc_table[2].context.sp = (long)&proc_table[2].stack[4095];
     proc_table[2].context.ra = (long)task2;
 }

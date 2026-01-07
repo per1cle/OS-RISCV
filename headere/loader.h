@@ -10,5 +10,8 @@ typedef struct {
 // Load and execute a program
 int exec_program(const char *name);
 
+// Wrapper for shell
+void exec(const char *name);
+
 // Initialize RAMFS
 void init_ramfs(void);

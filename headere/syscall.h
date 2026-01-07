@@ -2,6 +2,7 @@
 
 // Syscall numbers (Linux-style)
 #define SYS_WRITE   64
+#define SYS_EXIT    93      // Process exit
 #define SYS_YIELD   124
 #define SYS_GETTIME 169
 

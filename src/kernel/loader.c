@@ -79,9 +79,9 @@ int exec_program(const char *name) {
     }
     
     // Create process - entry point is at specific offset (_start symbol)
-    // For user1/user2, _start is at offset 0x1a8 from base
+    // For user1/user2, _start is at offset 0x1d8 from base (verified with nm)
     // Stack is placed 64KB after the program start
-    void *entry_point = (void*)(prog_mem + 0x1a8);
+    void *entry_point = (void*)(prog_mem + 0x1d8);
     int pid = create_process(entry_point, (void*)(prog_mem + 0x10000));
     
     if(pid < 0) {
@@ -94,4 +94,9 @@ int exec_program(const char *name) {
     kernel_putstring("\n");
     
     return pid;
+}
+
+// Wrapper for shell
+void exec(const char *name) {
+    exec_program(name);
 }

@@ -3,6 +3,7 @@
 #include "kernel_lib.h"
 #include "proc.h"
 #include "mm.h"
+#include "shell.h"
 
 void init_timer(void);
 void init_proc(void);
@@ -70,11 +71,13 @@ void kmain() {
 
     init_timer();
 
+    init_ramfs();
     init_proc();
 
-    exec_program("user1");
-    exec_program("user2");
-
+    // Inițializează shell-ul (polling mode)
+    shell_init();
+    
+    // Lansează scheduler-ul care va apela shell_poll() în idle
     scheduler();
 
     while(1);

@@ -3,6 +3,8 @@
 void kernel_putchar(char c);
 void kernel_putstring(const char *s);
 void kernel_print_hex(unsigned int n);
+char kernel_getchar(void);
+int kernel_getchar_nonblock(void);
 
 // Syscall wrapper - inline function
 static inline long syscall(long num, long arg0, long arg1, long arg2) {

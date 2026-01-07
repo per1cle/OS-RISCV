@@ -20,7 +20,7 @@ SRC_S = src/boot/start.S src/kernel/comutare.S
 SRC_C = src/kernel/main.c src/kernel/mm.c src/kernel/uart.c \
         src/kernel/interrupt.c src/kernel/timer.c \
         src/kernel_lib/kernel_lib.c src/kernel/proc.c \
-        src/kernel/syscall.c src/kernel/loader.c
+        src/kernel/syscall.c src/kernel/loader.c src/kernel/shell.c
 
 OBJS = $(SRC_S:.S=.o) $(SRC_C:.c=.o)
 
