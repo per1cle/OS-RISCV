@@ -1,33 +1,35 @@
 #!/bin/bash
-# Test final - demonstrație completă cu timer îmbunătățit
+{
+    sleep 2
+    printf "help\n"
+    sleep 2
+    printf "ps\n"
+    sleep 2
+    printf "uptime\n"
+    sleep 2
+    printf "mem\n"
+    sleep 2
+    printf "exec user1\n"
+    sleep 3
+    printf "exec user2\n"
+    sleep 7         
+    printf "ps\n"
+    sleep 2
+    printf "uptime\n"
+    sleep 2
+    printf "kill 1\n"
+    sleep 10        
+    printf "ps\n"
+    sleep 2
+    printf "kill 2\n"
+    sleep 2
+    printf "ps\n"
+    sleep 2
+    printf "mem\n"
+    sleep 2
+    printf "uptime\n"
+    sleep 2
+   
+    printf "\x01x"
+} | timeout 60 qemu-system-riscv32 -machine virt -bios none -kernel kernel.img -nographic -serial mon:stdio 2>&1 || true
 
-echo "=========================================="
-echo "  Test Final - Timer Îmbunătățit"
-echo "=========================================="
-echo ""
-
-cat > final_test.txt << 'EOF'
-help
-ps
-mem
-exec user1
-ps
-uptime
-EOF
-
-echo "Comenzi de test:"
-cat final_test.txt
-echo ""
-echo "Rulare cu timer la fiecare 10 secunde..."
-echo "=========================================="
-echo ""
-
-timeout 25 qemu-system-riscv32 -machine virt -bios none -kernel kernel.img -nographic -serial mon:stdio < final_test.txt 2>&1 || true
-
-rm -f final_test.txt
-echo ""
-echo "=========================================="
-echo "✅ Timer îmbunătățit - afișare la 10s!"
-echo "✅ Format: [Uptime: Xm Ys | Ticks: Z]"
-echo "✅ Interval suficient pentru a tasta comenzi"
-echo "=========================================="
