@@ -1,0 +1,75 @@
+#include "mm.h"
+#include "kernel_lib.h"
+
+static block_header_t* head = NULL;  //primul bloc din heap
+
+//adresa de start si dimensiunea totala a heap ului
+void mm_init(void* heap_start, size_t heap_size) {
+    if (heap_size < sizeof(block_header_t)) {
+        return; 
+    }
+
+    head = (block_header_t*) heap_start;
+    
+    head->size = heap_size;
+    head->is_free = 1;      
+    head->next = NULL;    
+}
+
+void* kmalloc(size_t size) {
+    if (size == 0) {
+        return NULL;
+    }
+
+    // 1. Aliniem cererea (opțional, dar o bună practică)
+    // De ex, aliniem la 8 bytes. Aici simplificăm și nu o facem.
+    
+    // 2. Parcurgem lista căutând un bloc potrivit
+    block_header_t* current = head;
+    while (current != NULL) {
+        if (current->is_free == 1 && current->size >= (size + sizeof(block_header_t))) {
+            //ar fi bine sa spargi blocul daca e prea mare
+            //aici il iau tot
+            
+            current->is_free = 0; 
+            
+            //returnam pointerul la zona de dupa header
+            return (void*)(current + 1); 
+        }
+        current = current->next; 
+    }
+
+    //mesaj out of memory
+    return NULL; 
+}
+
+void kfree(void* ptr)
+{
+    if (ptr == NULL) {
+        return;
+    }
+
+    // 1. Găsește header-ul blocului
+    // (Aritmetica pointerilor: mergi înapoi cu mărimea unui header)
+    block_header_t* block_to_free = (block_header_t*)ptr - 1;
+
+    // 2. Verifică dacă e un pointer valid (opțional, dar bun)
+    if (block_to_free->is_free == 1) {
+        kernel_putstring("MM: EROARE! Dubla eliberare (double free)!\n");
+        return;
+    }
+
+    // 3. Marchează blocul ca fiind liber
+    block_to_free->is_free = 1;
+    
+    // 4. (Opțional, dar necesar pt un alocator real) 
+    //    Încearcă să lipești (coalesce) blocul cu vecinii liberi
+    //    ... logica ta de "merge" ...
+
+    #if MM_DEBUG // Dacă ai un flag de debug
+    kernel_putstring("MM: kfree successful for block at ");
+    kernel_print_hex((unsigned int)ptr);
+    kernel_putstring("\n");
+    #endif
+}
+

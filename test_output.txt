@@ -1,0 +1,297 @@
+tatiana@tatiana:~/os/OS-RISCV$ make clean
+rm -f src/boot/start.o src/kernel/comutare.o src/kernel/main.o src/kernel/mm.o src/kernel/uart.o src/kernel/interrupt.o src/kernel/timer.o src/kernel_lib/kernel_lib.o src/kernel/proc.o src/kernel/syscall.o src/kernel/loader.o src/kernel/shell.o user1.o user2.o user1.bin user2.bin \
+      user1.elf user2.elf kernel.elf kernel.img
+tatiana@tatiana:~/os/OS-RISCV$ make run
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/boot/start.S -o src/boot/start.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/comutare.S -o src/kernel/comutare.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/main.c -o src/kernel/main.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/mm.c -o src/kernel/mm.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/uart.c -o src/kernel/uart.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/interrupt.c -o src/kernel/interrupt.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/timer.c -o src/kernel/timer.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel_lib/kernel_lib.c -o src/kernel_lib/kernel_lib.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/proc.c -o src/kernel/proc.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/syscall.c -o src/kernel/syscall.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/loader.c -o src/kernel/loader.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/shell.c -o src/kernel/shell.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -T script/user.ld -nostartfiles user/user1.c -o user1.elf
+riscv64-unknown-elf-objcopy -O binary user1.elf user1.bin
+riscv64-unknown-elf-ld -m elf32lriscv -r -b binary user1.bin -o user1.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -T script/user2.ld -nostartfiles user/user2.c -o user2.elf
+riscv64-unknown-elf-objcopy -O binary user2.elf user2.bin
+riscv64-unknown-elf-ld -m elf32lriscv -r -b binary user2.bin -o user2.o
+riscv64-unknown-elf-gcc -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -T script/kernel.ld -Wl,--no-warn-rwx-segments -o kernel.elf src/boot/start.o src/kernel/comutare.o src/kernel/main.o src/kernel/mm.o src/kernel/uart.o src/kernel/interrupt.o src/kernel/timer.o src/kernel_lib/kernel_lib.o src/kernel/proc.o src/kernel/syscall.o src/kernel/loader.o src/kernel/shell.o user1.o user2.o
+riscv64-unknown-elf-objcopy --output-target binary kernel.elf kernel.img
+/usr/bin/qemu-system-riscv32 \
+        -M virt \
+        -kernel kernel.img \
+        -nographic \
+        -bios none
+Booting...
+Hi Barbie!
+MM: Initializing kernel heap...
+--- Test 1-4 (Standard) ---
+  > p1 alloc at: 0x80013200
+  > p2 alloc at: 0x80013270
+  > p1 freed.
+  > p3 (reusing p1) alloc at: 0x80013200
+--- Test 5 (Coalescing / Lipire) ---
+  > Freeing p3 (addr: 0x80013200)
+  > Freeing p2 (addr: 0x80013270)
+  > Attempting kmalloc(220) (should succeed if merged)...
+  > SUCCESS! Coalescing works! Addr: 0x80013200
+--- MM TEST COMPLETE ---
+Timer initializat
+RAMFS: Initialized
+  - user1 (0x00000447 bytes)
+  - user2 (0x00000447 bytes)
+
+========================================
+  OS-RISCV Shell Monitor v1.0
+========================================
+Tastati 'help' pentru lista de comenzi
+
+> exec user1
+
+Lansare user1...
+exec: loading user1...
+exec: started PID 1
+
+> USER1: Hello from user program 1!
+USER1: Running...  [t=378]
+USER1: Running...  [t=408]
+USER1: Running...  [t=429]
+USER1: Running...  [t=451]
+USER1: Running...  [t=473]
+eUSER1: Running...  [t=498]
+xecUSER1: Running...  [t=528]
+ useUSER1: Running...  [t=568]
+r2USER1: Running...  [t=606]
+
+
+Lansare user2...
+exec: loading user2...
+exec: started PID 2
+
+> USER2: Hello from user program 2!
+USER2: Working... [t=623]
+USER1: Running...  [t=670]
+USER2: Working... [t=728]
+USER1: Running...  [t=766]
+pUSER2: Working... [t=829]
+sUSER1: Running...  [t=871]
+
+
+PID  STATE    CPU_TIME
+---  -------  --------
+0    READY    0 <--
+1    READY    303
+2    READY    199
+
+> USER2: Working... [t=945]
+USER1: Running...  [t=978]
+
+[Uptime: 10s | Ticks: 1000]
+kiUSER2: Working... [t=062]
+ll 1USER1: Running...  [t=104]
+
+Procesul 1 a fost terminat
+> USER2: Working... [t=172]
+USER2: Working... [t=243]
+USER2: Working... [t=309]
+killUSER2: Working... [t=390]
+ 2
+Procesul 2 a fost terminat
+> QEMU: Terminated
+tatiana@tatiana:~/os/OS-RISCV$ make clean
+rm -f src/boot/start.o src/kernel/comutare.o src/kernel/main.o src/kernel/mm.o src/kernel/uart.o src/kernel/interrupt.o src/kernel/timer.o src/kernel_lib/kernel_lib.o src/kernel/proc.o src/kernel/syscall.o src/kernel/loader.o src/kernel/shell.o user1.o user2.o user1.bin user2.bin \
+      user1.elf user2.elf kernel.elf kernel.img
+tatiana@tatiana:~/os/OS-RISCV$ make
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/boot/start.S -o src/boot/start.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/comutare.S -o src/kernel/comutare.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/main.c -o src/kernel/main.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/mm.c -o src/kernel/mm.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/uart.c -o src/kernel/uart.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/interrupt.c -o src/kernel/interrupt.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/timer.c -o src/kernel/timer.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel_lib/kernel_lib.c -o src/kernel_lib/kernel_lib.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/proc.c -o src/kernel/proc.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/syscall.c -o src/kernel/syscall.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/loader.c -o src/kernel/loader.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -c src/kernel/shell.c -o src/kernel/shell.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -T script/user.ld -nostartfiles user/user1.c -o user1.elf
+riscv64-unknown-elf-objcopy -O binary user1.elf user1.bin
+riscv64-unknown-elf-ld -m elf32lriscv -r -b binary user1.bin -o user1.o
+riscv64-unknown-elf-gcc -Wall -Werror -O0 -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -mcmodel=medany -Iheadere -T script/user2.ld -nostartfiles user/user2.c -o user2.elf
+riscv64-unknown-elf-objcopy -O binary user2.elf user2.bin
+riscv64-unknown-elf-ld -m elf32lriscv -r -b binary user2.bin -o user2.o
+riscv64-unknown-elf-gcc -nostdlib -ffreestanding -mabi=ilp32 -march=rv32ima_zicsr -T script/kernel.ld -Wl,--no-warn-rwx-segments -o kernel.elf src/boot/start.o src/kernel/comutare.o src/kernel/main.o src/kernel/mm.o src/kernel/uart.o src/kernel/interrupt.o src/kernel/timer.o src/kernel_lib/kernel_lib.o src/kernel/proc.o src/kernel/syscall.o src/kernel/loader.o src/kernel/shell.o user1.o user2.o
+riscv64-unknown-elf-objcopy --output-target binary kernel.elf kernel.img
+tatiana@tatiana:~/os/OS-RISCV$ ./final_test.sh
+Booting...
+Hi Barbie!
+MM: Initializing kernel heap...
+--- Test 1-4 (Standard) ---
+  > p1 alloc at: 0x80013200
+  > p2 alloc at: 0x80013270
+  > p1 freed.
+  > p3 (reusing p1) alloc at: 0x80013200
+--- Test 5 (Coalescing / Lipire) ---
+  > Freeing p3 (addr: 0x80013200)
+  > Freeing p2 (addr: 0x80013270)
+  > Attempting kmalloc(220) (should succeed if merged)...
+  > SUCCESS! Coalescing works! Addr: 0x80013200
+--- MM TEST COMPLETE ---
+Timer initializat
+RAMFS: Initialized
+  - user1 (0x00000447 bytes)
+  - user2 (0x00000447 bytes)
+
+========================================
+  OS-RISCV Shell Monitor v1.0
+========================================
+Tastati 'help' pentru lista de comenzi
+
+> help
+
+Comenzile disponibile:
+  help          - Afiseaza acest mesaj
+  ps            - Afiseaza procesele active
+  uptime        - Afiseaza tick counter si uptime
+  mem           - Afiseaza statistici memorie (heap)
+  kill <pid>    - Termina procesul cu PID-ul specificat
+  exec <prog>   - Lanseaza un program (user1/user2)
+
+> ps
+
+PID  STATE    CPU_TIME
+---  -------  --------
+0    READY    0 <--
+
+> uptime
+
+System Uptime:
+  Tick Counter: 491
+  Uptime: 4 seconds
+
+> mem
+
+Memory Statistics (Heap):
+  Total size:  134139404 bytes
+  Used:        232 bytes
+  Free:        134139172 bytes
+  Blocks:      2
+
+> exec user1
+
+Lansare user1...
+exec: loading user1...
+exec: started PID 1
+
+> USER1: Hello from user program 1!
+USER1: Running...  [t=776]
+USER1: Running...  [t=804]
+USER1: Running...  [t=824]
+USER1: Running...  [t=844]
+USER1: Running...  [t=864]
+USER1: Running...  [t=883]
+USER1: Running...  [t=904]
+USER1: Running...  [t=923]
+USER1: Running...  [t=943]
+USER1: Running...  [t=963]
+USER1: Running...  [t=982]
+
+[Uptime: 10s | Ticks: 1000]
+USER1: Running...  [t=009]
+exec user2
+
+Lansare user2...
+exec: loading user2...
+exec: started PID 2
+
+> USER2: Hello from user program 2!
+USER2: Working... [t=010]
+USER1: Running...  [t=107]
+USER2: Working... [t=120]
+USER1: Running...  [t=202]
+USER2: Working... [t=218]
+USER1: Running...  [t=298]
+USER2: Working... [t=317]
+USER1: Running...  [t=393]
+USER2: Working... [t=415]
+USER1: Running...  [t=491]
+USER2: Working... [t=516]
+USER1: Running...  [t=587]
+USER2: Working... [t=615]
+ps
+
+PID  STATE    CPU_TIME
+---  -------  --------
+0    READY    0 <--
+1    READY    419
+2    READY    467
+
+> USER1: Running...  [t=690]
+USER2: Working... [t=726]
+USER1: Running...  [t=786]
+USER2: Working... [t=824]
+uptime
+
+System Uptime:
+  Tick Counter: 1842
+  Uptime: 18 seconds
+
+> USER1: Running...  [t=890]
+USER2: Working... [t=938]
+USER1: Running...  [t=988]
+
+[Uptime: 20s | Ticks: 2000]
+kill 1
+Procesul 1 a fost terminat
+> USER2: Working... [t=046]
+USER2: Working... [t=120]
+USER2: Working... [t=192]
+USER2: Working... [t=267]
+USER2: Working... [t=341]
+USER2: Working... [t=419]
+USER2: Working... [t=509]
+USER2: Working... [t=583]
+USER2: Working... [t=656]
+USER2: Working... [t=731]
+USER2: Working... [t=800]
+USER2: Working... [t=865]
+USER2: Working... [t=930]
+ps
+
+PID  STATE    CPU_TIME
+---  -------  --------
+0    READY    0 <--
+2    READY    1659
+
+> 
+[Uptime: 30s | Ticks: 3000]
+USER2: Working... [t=017]
+USER2: Working... [t=083]
+kill 2
+Procesul 2 a fost terminat
+> ps
+
+PID  STATE    CPU_TIME
+---  -------  --------
+0    READY    0 <--
+
+> mem
+
+Memory Statistics (Heap):
+  Total size:  134139404 bytes
+  Used:        232 bytes
+  Free:        134139172 bytes
+  Blocks:      2
+
+> uptime
+
+System Uptime:
+  Tick Counter: 3107
+  Uptime: 31 seconds
+
+> QEMU: Terminated

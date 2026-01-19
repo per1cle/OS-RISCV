@@ -1,0 +1,8 @@
+*.o
+*.d
+
+*.elf
+*.bin
+kernel.img
+
+.gdbinit
