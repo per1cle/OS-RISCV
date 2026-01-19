@@ -1,5 +1,6 @@
 .section .text
 .globl comutare
+.globl resume_from_trap
 .align 2
 
 comutare:
@@ -34,3 +35,55 @@ comutare:
     lw s11, 52(a1)
 
     ret
+
+# resume_from_trap(struct trap_frame *tf)
+# Restores all registers from trap frame and returns to user process with mret
+resume_from_trap:
+    mv t6, a0           # t6 = &trap_frame.regs[0]
+    
+    # Restore all registers except sp and t6 (we're using t6)
+    lw x1, 0(t6)        # ra
+    # sp will be restored last
+    lw x3, 8(t6)        # gp
+    lw x4, 12(t6)       # tp
+    lw x5, 16(t6)       # t0
+    lw x6, 20(t6)       # t1
+    lw x7, 24(t6)       # t2
+    lw x8, 28(t6)       # s0/fp
+    lw x9, 32(t6)       # s1
+    lw x10, 36(t6)      # a0
+    lw x11, 40(t6)      # a1
+    lw x12, 44(t6)      # a2
+    lw x13, 48(t6)      # a3
+    lw x14, 52(t6)      # a4
+    lw x15, 56(t6)      # a5
+    lw x16, 60(t6)      # a6
+    lw x17, 64(t6)      # a7
+    lw x18, 68(t6)      # s2
+    lw x19, 72(t6)      # s3
+    lw x20, 76(t6)      # s4
+    lw x21, 80(t6)      # s5
+    lw x22, 84(t6)      # s6
+    lw x23, 88(t6)      # s7
+    lw x24, 92(t6)      # s8
+    lw x25, 96(t6)      # s9
+    lw x26, 100(t6)     # s10
+    lw x27, 104(t6)     # s11
+    lw x28, 108(t6)     # t3
+    lw x29, 112(t6)     # t4
+    lw x30, 116(t6)     # t5
+    # x31 is t6, restore it last
+    lw x2, 4(t6)        # sp
+    
+    # Restore mepc and mstatus (offset 124 = 31*4, offset 128 = 32*4)
+    lw t0, 124(t6)
+    csrw mepc, t0
+    lw t0, 128(t6)
+    # Set both MIE (bit 3) and MPIE (bit 7) to ensure interrupts enabled after mret
+    li t1, 0x88      # MIE | MPIE = bit 3 | bit 7
+    or t0, t0, t1
+    csrw mstatus, t0
+    
+    lw x31, 120(t6)     # t6
+    
+    mret

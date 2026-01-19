@@ -74,7 +74,24 @@ handler:
     lw a7, 64(sp)       # a7 = x17
     
     call handler_c
-
+    sw a0, 36(sp)       # Save handler_c return value
+    
+    # Check if we need to do context switch (check need_resched and proc_actual)
+    la t0, need_resched
+    lw t1, 0(t0)
+    beqz t1, restore_regs  # If need_resched == 0, skip preempt
+    
+    la t0, proc_actual
+    lw t1, 0(t0)
+    beqz t1, restore_regs  # If proc_actual == 0, skip preempt (we're in scheduler)
+    
+    # Call preempt_from_handler(stack_frame)
+    mv a0, sp           # Pass stack frame pointer as argument
+    call preempt_from_handler
+    # This will not return here - it will switch to scheduler
+    # If it does return, something went wrong, just restore normally
+    
+restore_regs:
     # Restaurează registrele (inclusiv a0 care poate conține return value)
     lw x1, 0(sp)
     lw x3, 8(sp)

@@ -42,7 +42,7 @@ void _start(void) {
     while(count < 100000) {  
         if(count % 1000 == 0) {
             puts("USER2: Working... ");
-            long time = sys_gettime();
+            long time = sys_gettime() % 1000;  // Only last 3 digits
             char buf[10];
             buf[0] = '[';
             buf[1] = 't';

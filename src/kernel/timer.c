@@ -77,7 +77,7 @@ void tick(){
     }
     long next_time = *CLINT_MTIME + TIMER_INTERVAL;
     *CLINT_MTIMECMP = next_time;
-    preempt();
+    need_resched = 1;
 }
 void init_timer(void){
     long current_time = *CLINT_MTIME;
